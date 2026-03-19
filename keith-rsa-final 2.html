@@ -1,849 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KEITH RSA — Official</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --gold: #C9A84C;
-    --gold-light: #F0D080;
-    --gold-dim: #7A6020;
-    --black: #0A0A0A;
-    --dark: #111111;
-    --dark2: #1A1A1A;
-    --dark3: #222222;
-    --white: #F5F0E8;
-    --grey: #888;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { background: var(--black); color: var(--white); font-family: 'Crimson Pro', serif; overflow-x: hidden; }
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--black); }
-  ::-webkit-scrollbar-thumb { background: var(--gold); }
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 9999; opacity: 0.4;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 48px;
-    background: linear-gradient(to bottom, rgba(10,10,10,0.97), transparent);
-    backdrop-filter: blur(4px);
-  }
-  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: var(--gold); text-decoration: none; }
-  .nav-links { display: flex; gap: 36px; list-style: none; }
-  .nav-links a { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--white); text-decoration: none; opacity: 0.7; transition: opacity 0.2s, color 0.2s; }
-  .nav-links a:hover { opacity: 1; color: var(--gold); }
-
-  /* HERO */
-  #hero {
-    height: 100vh; display: flex; align-items: flex-end;
-    padding: 0 48px 80px; position: relative; overflow: hidden; background: var(--black);
-  }
-  .hero-bg {
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse 60% 80% at 70% 40%, rgba(201,168,76,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,168,76,0.06) 0%, transparent 50%),
-      linear-gradient(160deg, #0a0a0a 0%, #141008 50%, #0a0a0a 100%);
-  }
-  .hero-grid {
-    position: absolute; inset: 0;
-    background-image: linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
-  }
-  .hero-content { position: relative; z-index: 2; }
-  .hero-tag { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 5px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
-  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 14vw, 180px); line-height: 0.88; letter-spacing: 4px; color: var(--white); opacity: 0; animation: fadeUp 0.8s 0.5s forwards; }
-  .hero-title span { color: var(--gold); }
-  .hero-subtitle { font-size: 18px; font-weight: 300; font-style: italic; color: var(--grey); margin-top: 20px; opacity: 0; animation: fadeUp 0.8s 0.7s forwards; }
-  .hero-cta { display: flex; gap: 16px; margin-top: 40px; opacity: 0; animation: fadeUp 0.8s 0.9s forwards; }
-  .btn-primary { background: var(--gold); color: var(--black); font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; padding: 14px 32px; border: none; cursor: pointer; text-decoration: none; font-weight: 700; transition: background 0.2s, transform 0.15s; display: inline-block; }
-  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
-  .btn-outline { background: transparent; color: var(--gold); font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; padding: 14px 32px; border: 1px solid var(--gold-dim); cursor: pointer; text-decoration: none; transition: border-color 0.2s, color 0.2s, transform 0.15s; display: inline-block; }
-  .btn-outline:hover { border-color: var(--gold); color: var(--gold-light); transform: translateY(-2px); }
-  .hero-scroll { position: absolute; right: 48px; bottom: 80px; display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0; animation: fadeUp 1s 1.2s forwards; }
-  .hero-scroll span { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 3px; writing-mode: vertical-rl; color: var(--gold); }
-  .scroll-line { width: 1px; height: 60px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollPulse 2s infinite; }
-
-  /* SHARED SECTION STYLES */
-  section { padding: 100px 48px; }
-  .section-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 6vw, 80px); letter-spacing: 3px; color: var(--white); line-height: 1; margin-bottom: 8px; }
-  .divider { width: 60px; height: 2px; background: var(--gold); margin-bottom: 48px; margin-top: 8px; }
-
-  /* MUSIC */
-  #music { background: var(--dark); }
-  .music-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px; }
-  .track-card { background: var(--dark2); border: 1px solid rgba(201,168,76,0.08); transition: border-color 0.3s, transform 0.2s; overflow: hidden; }
-  .track-card:hover { border-color: rgba(201,168,76,0.4); transform: translateY(-4px); }
-  .track-art { width: 100%; aspect-ratio: 1; background: var(--dark3); position: relative; overflow: hidden; }
-  .track-art img { width: 100%; height: 100%; object-fit: cover; }
-  .track-art-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #1a1508, #2a200a, #1a1508); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 60px; color: rgba(201,168,76,0.15); letter-spacing: 4px; }
-  .play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
-  .track-card:hover .play-overlay { opacity: 1; }
-  .play-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; transition: transform 0.15s, background 0.2s; }
-  .play-btn:hover { transform: scale(1.1); background: var(--gold-light); }
-  .play-btn.playing { background: var(--gold-light); }
-  .track-info { padding: 20px; }
-  .track-type { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
-  .track-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; margin-bottom: 4px; }
-  .track-meta { font-size: 13px; color: var(--grey); margin-bottom: 16px; }
-  .track-footer { display: flex; justify-content: space-between; align-items: center; }
-  .track-price { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--gold); letter-spacing: 2px; }
-  .buy-btn { background: transparent; border: 1px solid var(--gold-dim); color: var(--gold); font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px; padding: 8px 16px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
-  .buy-btn:hover { background: var(--gold); color: var(--black); border-color: var(--gold); }
-
-  /* GALLERY */
-  #gallery { background: var(--black); }
-  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px; }
-  .gallery-item { aspect-ratio: 1; background: var(--dark2); overflow: hidden; position: relative; cursor: pointer; }
-  .gallery-item img, .gallery-item video { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
-  .gallery-item:hover img, .gallery-item:hover video { transform: scale(1.05); }
-  .gallery-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #1a1508, #0a0a0a); display: flex; align-items: center; justify-content: center; font-size: 40px; color: rgba(201,168,76,0.15); font-family: 'Bebas Neue', sans-serif; letter-spacing: 3px; }
-
-  /* BIO */
-  #bio { background: var(--dark); }
-  .bio-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: 80px; align-items: start; }
-  .bio-photo { aspect-ratio: 3/4; background: var(--dark2); border: 1px solid rgba(201,168,76,0.1); overflow: hidden; position: relative; }
-  .bio-photo img { width: 100%; height: 100%; object-fit: cover; }
-  .bio-photo-placeholder { width: 100%; height: 100%; background: linear-gradient(160deg, #1a1508, #0a0a0a 60%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: rgba(201,168,76,0.1); letter-spacing: 4px; }
-  .bio-quote { font-size: clamp(22px, 3vw, 34px); font-style: italic; font-weight: 300; color: var(--gold); line-height: 1.4; margin-bottom: 28px; border-left: 2px solid var(--gold); padding-left: 24px; }
-  .bio-body { font-size: 18px; line-height: 1.8; color: rgba(245,240,232,0.75); margin-bottom: 22px; }
-  .bio-stats { display: flex; gap: 40px; margin-top: 44px; padding-top: 28px; border-top: 1px solid rgba(201,168,76,0.15); }
-  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--gold); line-height: 1; }
-  .stat-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--grey); text-transform: uppercase; margin-top: 4px; }
-
-  /* COMMENTS */
-  #comments { background: var(--black); }
-  .comments-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; }
-  .comment-list { display: flex; flex-direction: column; gap: 20px; }
-  .comment-card { background: var(--dark2); border-left: 2px solid var(--gold-dim); padding: 20px 24px; transition: border-color 0.2s; }
-  .comment-card:hover { border-color: var(--gold); }
-  .comment-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-  .comment-author { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--gold); letter-spacing: 2px; }
-  .comment-date { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--grey); }
-  .comment-text { font-size: 16px; line-height: 1.6; color: rgba(245,240,232,0.8); }
-  .comment-form { background: var(--dark2); border: 1px solid rgba(201,168,76,0.1); padding: 32px; position: sticky; top: 100px; }
-  .comment-form h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); letter-spacing: 3px; margin-bottom: 24px; }
-
-  /* FORM ELEMENTS */
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--grey); text-transform: uppercase; margin-bottom: 8px; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; background: var(--dark3); border: 1px solid rgba(201,168,76,0.15); color: var(--white); font-family: 'Crimson Pro', serif; font-size: 16px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
-  .form-group select option { background: var(--dark3); }
-  .form-group textarea { resize: vertical; min-height: 80px; }
-
-  /* ADMIN */
-  #admin { background: var(--dark); border-top: 1px solid rgba(201,168,76,0.1); }
-  .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .upload-card { background: var(--dark2); border: 1px solid rgba(201,168,76,0.1); padding: 32px; }
-  .upload-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; color: var(--gold); margin-bottom: 24px; }
-  .drop-zone { border: 1px dashed rgba(201,168,76,0.3); padding: 28px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 16px; }
-  .drop-zone:hover { border-color: var(--gold); background: rgba(201,168,76,0.03); }
-  .drop-zone p { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--grey); }
-  .drop-zone .drop-icon { font-size: 30px; margin-bottom: 8px; }
-  .upload-list { margin-top: 12px; }
-  .upload-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
-  .upload-item .name { color: var(--white); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 85%; }
-  .upload-item .remove { color: var(--gold-dim); cursor: pointer; font-size: 18px; line-height: 1; flex-shrink: 0; }
-  .upload-item .remove:hover { color: #e44; }
-  .admin-lock { display: flex; flex-direction: column; align-items: center; padding: 60px 0; gap: 16px; }
-  .admin-lock p { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 2px; color: var(--grey); }
-  .admin-panel { display: none; }
-  .admin-panel.unlocked { display: block; }
-
-  /* PLAYER BAR */
-  #player-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(10,10,10,0.97);
-    border-top: 1px solid rgba(201,168,76,0.25);
-    padding: 12px 48px;
-    display: flex; align-items: center; gap: 24px;
-    z-index: 900; backdrop-filter: blur(12px);
-    transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-  }
-  #player-bar.visible { transform: translateY(0); }
-  .player-track { flex: 1; min-width: 0; }
-  .player-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .player-artist { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 2px; }
-  .player-controls { display: flex; align-items: center; gap: 16px; }
-  .player-btn { background: none; border: none; color: var(--white); cursor: pointer; opacity: 0.7; transition: opacity 0.2s, color 0.2s; padding: 4px; display: flex; align-items: center; justify-content: center; }
-  .player-btn:hover { opacity: 1; color: var(--gold); }
-  .player-btn.play-pause { width: 40px; height: 40px; border-radius: 50%; background: var(--gold); color: var(--black); opacity: 1; transition: background 0.2s; }
-  .player-btn.play-pause:hover { background: var(--gold-light); }
-  .player-progress { flex: 2; display: flex; align-items: center; gap: 12px; }
-  .progress-bar { flex: 1; height: 3px; background: var(--dark3); border-radius: 2px; cursor: pointer; position: relative; }
-  .progress-bar:hover .progress-fill { background: var(--gold-light); }
-  .progress-fill { height: 100%; background: var(--gold); border-radius: 2px; width: 0%; pointer-events: none; }
-  .time-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--grey); white-space: nowrap; min-width: 32px; text-align: center; }
-
-  /* MODAL */
-  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-  .modal.open { display: flex; }
-  .modal-content { background: var(--dark2); border: 1px solid rgba(201,168,76,0.2); padding: 40px; max-width: 500px; width: 90%; position: relative; }
-  .modal-close { position: absolute; top: 16px; right: 20px; font-size: 24px; cursor: pointer; color: var(--grey); background: none; border: none; transition: color 0.2s; }
-  .modal-close:hover { color: var(--gold); }
-  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; color: var(--gold); margin-bottom: 8px; }
-  .modal-track { font-size: 14px; color: var(--grey); margin-bottom: 20px; }
-  .modal-price { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--white); letter-spacing: 3px; margin-bottom: 24px; }
-
-  /* TOAST */
-  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--gold); color: var(--black); font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 2px; padding: 12px 24px; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 3000; }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* FOOTER */
-  footer { background: var(--black); border-top: 1px solid rgba(201,168,76,0.1); padding: 48px; display: flex; justify-content: space-between; align-items: center; }
-  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 6px; color: var(--gold); }
-  .footer-links { display: flex; gap: 24px; }
-  .footer-links a { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--grey); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
-  .footer-links a:hover { color: var(--gold); }
-  .footer-copy { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(136,136,136,0.4); letter-spacing: 1px; }
-
-  /* ANIMATIONS */
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes scrollPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    nav { padding: 16px 24px; }
-    .nav-links { display: none; }
-    section { padding: 60px 24px; }
-    #hero { padding: 0 24px 60px; }
-    .bio-layout { grid-template-columns: 1fr; gap: 40px; }
-    .comments-layout { grid-template-columns: 1fr; }
-    .admin-grid { grid-template-columns: 1fr; }
-    footer { flex-direction: column; gap: 20px; text-align: center; }
-    .hero-scroll { display: none; }
-    #player-bar { padding: 12px 16px; gap: 12px; }
-    .player-progress { display: none; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keith RSA Hybrid</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0A0A0A;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .hero {
+            background: #C9A84C;
+            padding: 20px;
+            text-align: center;
+        }
+        .music-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .custom-music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .bio, .comments, .admin-panel {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .player-bar {
+            background: #C9A84C;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+        .upload-form input, .upload-form button {
+            margin: 5px;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-
-<!-- HIDDEN REAL AUDIO ENGINE -->
-<audio id="audio-engine" preload="auto"></audio>
-
-<!-- NAV -->
-<nav>
-  <a href="#hero" class="nav-logo">KEITH RSA</a>
-  <ul class="nav-links">
-    <li><a href="#music">Music</a></li>
-
-    <li><a href="#bio">Bio</a></li>
-    <li><a href="#comments">Comments</a></li>
-    <li><a href="#admin">Admin</a></li>
-  </ul>
-</nav>
-
-<!-- HERO -->
-<section id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-content">
-    <p class="hero-tag">&#9670; South Africa's Finest &#9670;</p>
-    <h1 class="hero-title">KEITH<br><span>RSA</span></h1>
-    <p class="hero-subtitle">Hip-Hop &middot; Rap &middot; Culture</p>
-    <div class="hero-cta">
-      <a href="#music" class="btn-primary">Shop Music</a>
-      <a href="#bio" class="btn-outline">About Keith</a>
+    <div class="hero">
+        <h1>Welcome to Keith RSA Hybrid</h1>
     </div>
-  </div>
-  <div class="hero-scroll">
-    <span>Scroll</span>
-    <div class="scroll-line"></div>
-  </div>
-</section>
-
-<!-- MUSIC STORE -->
-<section id="music">
-  <p class="section-label">&#9670; Store</p>
-  <h2 class="section-title">Music</h2>
-  <div class="divider"></div>
-  <div class="music-grid" id="music-grid"></div>
-</section>
-
-
-
-<!-- BIO -->
-<section id="bio">
-  <p class="section-label">&#9670; The Story</p>
-  <h2 class="section-title">Bio</h2>
-  <div class="divider"></div>
-  <div class="bio-layout">
-    <div class="bio-photo" id="bio-photo-container">
-      <div class="bio-photo-placeholder">KR</div>
-    </div>
-    <div class="bio-text">
-      <p class="bio-quote" id="bio-quote">"Music is the language I speak when words aren't enough."</p>
-      <p class="bio-body" id="bio-body-1">Keith RSA is a rising force in the South African hip-hop scene, delivering bars forged from lived experience, street wisdom, and relentless ambition. Born and raised in South Africa, his sound bridges the raw energy of local rap culture with a global sonic vision.</p>
-      <p class="bio-body" id="bio-body-2">His music speaks to the grind — to those who hustle in the shadows and dream in the light. With every track, Keith RSA carves deeper into the culture, building a legacy one verse at a time.</p>
-      <div class="bio-stats">
-        <div><div class="stat-num" id="stat-tracks">0</div><div class="stat-label">Tracks</div></div>
-        <div><div class="stat-num" id="stat-years">1</div><div class="stat-label">Years Active</div></div>
-        <div><div class="stat-num" id="stat-fans">—</div><div class="stat-label">Fans</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- COMMENTS -->
-<section id="comments">
-  <p class="section-label">&#9670; Fan Wall</p>
-  <h2 class="section-title">Comments</h2>
-  <div class="divider"></div>
-  <div class="comments-layout">
-    <div class="comment-list" id="comment-list"></div>
-    <div class="comment-form">
-      <h3>Leave a Comment</h3>
-      <div class="form-group"><label>Your Name</label><input type="text" id="comment-name" placeholder="Enter your name..."></div>
-      <div class="form-group"><label>Message</label><textarea id="comment-text" rows="5" placeholder="What do you think about the music?"></textarea></div>
-      <button class="btn-primary" onclick="submitComment()" style="width:100%;text-align:center">Post Comment</button>
-    </div>
-  </div>
-</section>
-
-<!-- ADMIN PANEL -->
-<section id="admin">
-  <p class="section-label">&#9670; Artist Panel</p>
-  <h2 class="section-title">Admin</h2>
-  <div class="divider"></div>
-
-  <div class="admin-lock" id="admin-lock">
-    <p>&#128274; ARTIST ACCESS ONLY</p>
-    <div class="form-group" style="width:300px;margin:0 auto">
-      <label>Password</label>
-      <input type="password" id="admin-pass" placeholder="Enter password..." onkeydown="if(event.key==='Enter')unlockAdmin()">
-    </div>
-    <button class="btn-primary" onclick="unlockAdmin()">Unlock Panel</button>
-
-  </div>
-
-  <div class="admin-panel" id="admin-panel">
-    <div class="admin-grid">
-
-      <!-- Upload Music -->
-      <div class="upload-card">
-        <h3>&#9835; Upload Music</h3>
-        <div class="form-group"><label>Track Title</label><input type="text" id="track-title" placeholder="e.g. Streets Know My Name"></div>
-        <div class="form-group"><label>Type</label>
-          <select id="track-type"><option>Single</option><option>Album</option><option>EP</option><option>Mixtape</option><option>Feature</option></select>
+    <div class="music-section">
+        <h2>My Music</h2>
+        <div class="custom-music-grid">  
+            <!-- Custom uploaded tracks will be displayed here -->
+            <div>Track 1</div>
+            <div>Track 2</div>
+            <div>Track 3</div>
+            <!-- Add dynamic content here -->
         </div>
-        <div class="form-group"><label>Price (R)</label><input type="number" id="track-price" placeholder="e.g. 25"></div>
-        <div class="form-group">
-          <label>Audio File (MP3 / WAV)</label>
-          <div class="drop-zone" onclick="document.getElementById('audio-upload').click()">
-            <div class="drop-icon">🎵</div>
-            <p id="audio-label">Click to select MP3 or WAV file</p>
-            <input type="file" id="audio-upload" accept="audio/*" style="display:none" onchange="handleAudioSelect(this)">
-          </div>
+        <h3>Featured Audiomack Tracks</h3>
+        <div class="audiomack-embed">
+            <!-- Audiomack player widget example -->
+            <iframe src="https://audiomack.com/embed/track/abc123" width="100%" height="166" scrolling="no" frameborder="0" seamless></iframe>
         </div>
-        <div class="form-group">
-          <label>Cover Art</label>
-          <div class="drop-zone" onclick="document.getElementById('art-upload').click()">
-            <div class="drop-icon" id="art-preview-icon">🖼️</div>
-            <p id="art-label">Click to upload cover image</p>
-            <input type="file" id="art-upload" accept="image/*" style="display:none" onchange="handleArtSelect(this)">
-          </div>
-        </div>
-        <button class="btn-primary" onclick="addTrack()" style="width:100%">Add to Store</button>
-      </div>
-
-
-
-      <!-- Edit Bio -->
-      <div class="upload-card" style="grid-column:1/-1">
-        <h3>✏️ Edit Bio</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-          <div>
-            <div class="form-group"><label>Quote</label><input type="text" id="bio-quote-input" placeholder="Your signature quote..."></div>
-            <div class="form-group"><label>Bio Paragraph 1</label><textarea id="bio-p1-input" rows="4" placeholder="First paragraph..."></textarea></div>
-          </div>
-          <div>
-            <div class="form-group"><label>Bio Paragraph 2</label><textarea id="bio-p2-input" rows="4" placeholder="Second paragraph..."></textarea></div>
-            <div class="form-group"><label>Years Active</label><input type="number" id="bio-years-input" placeholder="e.g. 3"></div>
-            <div class="form-group"><label>Fan Count</label><input type="text" id="bio-fans-input" placeholder="e.g. 10K"></div>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;align-items:flex-end">
-          <button class="btn-primary" onclick="saveBio()">Save Bio</button>
-          <div class="form-group" style="flex:1;margin:0">
-            <label>Profile Photo</label>
-            <input type="file" id="bio-photo-upload" accept="image/*" onchange="handleBioPhoto(this)"
-              style="background:var(--dark3);border:1px solid rgba(201,168,76,0.15);color:var(--white);padding:8px;width:100%;font-family:'Crimson Pro',serif">
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">KEITH RSA</div>
-  <div class="footer-links">
-    <a href="#">Instagram</a>
-    <a href="#">Twitter</a>
-    <a href="#">SoundCloud</a>
-    <a href="#">YouTube</a>
-  </div>
-  <p class="footer-copy">&copy; 2024 Keith RSA. All Rights Reserved.</p>
-</footer>
-
-<!-- PLAYER BAR -->
-<div id="player-bar">
-  <div class="player-track">
-    <div class="player-title" id="player-title">—</div>
-    <div class="player-artist">KEITH RSA</div>
-  </div>
-  <div class="player-controls">
-    <button class="player-btn" onclick="prevTrack()" title="Previous">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="19,20 9,12 19,4"/><rect x="5" y="4" width="3" height="16"/></svg>
-    </button>
-    <button class="player-btn play-pause" id="play-pause-btn" onclick="togglePlay()">
-      <svg id="pp-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-left:2px"><polygon points="5,3 19,12 5,21"/></svg>
-    </button>
-    <button class="player-btn" onclick="nextTrack()" title="Next">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,4 15,12 5,20"/><rect x="16" y="4" width="3" height="16"/></svg>
-    </button>
-  </div>
-  <div class="player-progress">
-    <span class="time-label" id="time-current">0:00</span>
-    <div class="progress-bar" id="progress-bar" onclick="seekTrack(event)">
-      <div class="progress-fill" id="progress-fill"></div>
+    <div class="bio">
+        <h2>About Me</h2>
+        <p>This section contains a brief bio about the artist.</p>
     </div>
-    <span class="time-label" id="time-total">0:00</span>
-  </div>
-</div>
-
-<!-- BUY MODAL -->
-<div class="modal" id="buy-modal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal()">&#10005;</button>
-    <div class="modal-title">Buy Track</div>
-    <div class="modal-track" id="modal-track-name">—</div>
-    <div class="modal-price" id="modal-price">R0</div>
-    <div class="form-group"><label>Email Address</label><input type="email" id="buyer-email" placeholder="your@email.com"></div>
-    <button class="btn-primary" onclick="completePurchase()" style="width:100%">Complete Purchase</button>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script>
-// ═══════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════
-const audio = document.getElementById('audio-engine');
-
-// tracks: { title, type, price, artDataUrl, audioBlob (File object) }
-// audioBlobUrls: map of index -> object URL (in-memory, not localStorage)
-let tracks = [];
-let audioBlobUrls = {}; // idx -> blob URL
-let galleryItems = []; // { blobUrl, type, name }
-let comments = [
-  { name: "Sipho M.", text: "🔥 Fire bars! Keith RSA on another level bro, keep going!", date: "2 days ago" },
-  { name: "Ayanda K.", text: "The flow on the last track is crazy! SA hip-hop is blessed to have you.", date: "5 days ago" },
-  { name: "Lungelo T.", text: "Been rocking with Keith since day one. The grind never stops 💪", date: "1 week ago" }
-];
-
-// Load saved track metadata (art + info, not audio — audio is too large)
-try {
-  const saved = JSON.parse(localStorage.getItem('kr_tracks_v3') || '[]');
-  tracks = saved;
-} catch(e) {}
-
-try {
-  const savedComments = JSON.parse(localStorage.getItem('kr_comments') || 'null');
-  if (savedComments) comments = savedComments;
-} catch(e) {}
-
-let currentIdx = -1;
-let selectedAudioFile = null;
-let selectedArtDataUrl = null;
-let buyTarget = null;
-
-// ═══════════════════════════════════════════════
-//  AUDIO ENGINE — using real HTML5 audio + blob URLs
-// ═══════════════════════════════════════════════
-
-function fmt(s) {
-  if (!s || isNaN(s) || !isFinite(s)) return '0:00';
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return m + ':' + (sec < 10 ? '0' : '') + sec;
-}
-
-function setPlayIcon(playing) {
-  const icon = document.getElementById('pp-icon');
-  if (playing) {
-    icon.innerHTML = '<rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/>';
-  } else {
-    icon.innerHTML = '<polygon points="5,3 19,12 5,21" style="margin-left:2px"/>';
-  }
-}
-
-audio.addEventListener('timeupdate', () => {
-  if (!audio.duration) return;
-  const pct = (audio.currentTime / audio.duration) * 100;
-  document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('time-current').textContent = fmt(audio.currentTime);
-  document.getElementById('time-total').textContent = fmt(audio.duration);
-});
-
-audio.addEventListener('play', () => { setPlayIcon(true); updateCardIcons(); });
-audio.addEventListener('pause', () => { setPlayIcon(false); updateCardIcons(); });
-audio.addEventListener('ended', () => { nextTrack(); });
-audio.addEventListener('error', () => { showToast('Audio error — try re-uploading'); });
-
-function updateCardIcons() {
-  document.querySelectorAll('.play-btn').forEach((btn, i) => {
-    const isActive = (i === currentIdx && !audio.paused);
-    btn.innerHTML = isActive
-      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="#0A0A0A"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>'
-      : '<svg width="20" height="20" viewBox="0 0 24 24" fill="#0A0A0A" style="margin-left:3px"><polygon points="5,3 19,12 5,21"/></svg>';
-  });
-}
-
-function playTrack(idx) {
-  // If same track, toggle
-  if (idx === currentIdx && audio.src) {
-    audio.paused ? audio.play() : audio.pause();
-    return;
-  }
-
-  const blobUrl = audioBlobUrls[idx];
-  if (!blobUrl) {
-    showToast('No audio file — add audio in Admin panel first');
-    return;
-  }
-
-  currentIdx = idx;
-  audio.src = blobUrl;
-  audio.currentTime = 0;
-
-  // Show player bar
-  document.getElementById('player-bar').classList.add('visible');
-  document.getElementById('player-title').textContent = tracks[idx].title.toUpperCase();
-
-  audio.play().catch(err => {
-    console.warn('Play error:', err);
-    showToast('Tap the play button ▶ to start playback');
-  });
-}
-
-function togglePlay() {
-  if (currentIdx < 0 || !audio.src) {
-    showToast('Select a track first');
-    return;
-  }
-  audio.paused ? audio.play() : audio.pause();
-}
-
-function prevTrack() {
-  if (!tracks.length) return;
-  const idx = currentIdx <= 0 ? tracks.length - 1 : currentIdx - 1;
-  playTrack(idx);
-}
-
-function nextTrack() {
-  if (!tracks.length) return;
-  const idx = (currentIdx + 1) % tracks.length;
-  playTrack(idx);
-}
-
-function seekTrack(e) {
-  if (!audio.duration) return;
-  const bar = document.getElementById('progress-bar');
-  const rect = bar.getBoundingClientRect();
-  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  audio.currentTime = pct * audio.duration;
-}
-
-// ═══════════════════════════════════════════════
-//  RENDER TRACKS
-// ═══════════════════════════════════════════════
-function renderTracks() {
-  const grid = document.getElementById('music-grid');
-  if (tracks.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:80px 0;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--grey)">NO TRACKS YET — ADD YOUR MUSIC IN THE ADMIN PANEL</div>`;
-    return;
-  }
-  grid.innerHTML = tracks.map((t, i) => `
-    <div class="track-card">
-      <div class="track-art">
-        ${t.artDataUrl
-          ? `<img src="${t.artDataUrl}" alt="${t.title}">`
-          : `<div class="track-art-placeholder">KR</div>`}
-        <div class="play-overlay">
-          <button class="play-btn" onclick="playTrack(${i})">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A0A0A" style="margin-left:3px"><polygon points="5,3 19,12 5,21"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="track-info">
-        <div class="track-type">${t.type}</div>
-        <div class="track-name">${t.title}</div>
-        <div class="track-meta">Keith RSA
-          ${audioBlobUrls[i]
-            ? '<span style="color:var(--gold);font-size:11px;font-family:\'Space Mono\',monospace;letter-spacing:1px"> ▶ ready</span>'
-            : '<span style="color:var(--gold-dim);font-size:11px;font-family:\'Space Mono\',monospace"> (upload audio)</span>'}
-        </div>
-        <div class="track-footer">
-          <div class="track-price">R${t.price}</div>
-          <div style="display:flex;gap:6px">
-            ${audioBlobUrls[i] ? `<a class="buy-btn" href="${audioBlobUrls[i]}" download="${t.title}.mp3" style="text-decoration:none">Free DL</a>` : ''}
-            <button class="buy-btn" onclick="openBuyModal(${i})">Buy Now</button>
-          </div>
-        </div>
-      </div>
+    <div class="comments">
+        <h2>Comments</h2>
+        <textarea placeholder="Leave a comment..." rows="4" style="width: 100%;"></textarea>
+        <button>Submit</button>
     </div>
-  `).join('');
-  document.getElementById('stat-tracks').textContent = tracks.length;
-}
-
-// ═══════════════════════════════════════════════
-//  ADMIN — Add Track
-// ═══════════════════════════════════════════════
-function handleAudioSelect(input) {
-  const file = input.files[0];
-  if (!file) return;
-  selectedAudioFile = file;
-  document.getElementById('audio-label').textContent = '✓  ' + file.name;
-  showToast('Audio ready ✓');
-}
-
-function handleArtSelect(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    selectedArtDataUrl = e.target.result;
-    document.getElementById('art-label').textContent = '✓  ' + file.name;
-    document.getElementById('art-preview-icon').textContent = '';
-    const previewImg = document.createElement('img');
-    previewImg.src = selectedArtDataUrl;
-    previewImg.style.cssText = 'width:64px;height:64px;object-fit:cover;margin:0 auto 6px;display:block;border:1px solid var(--gold-dim)';
-    const icon = document.getElementById('art-preview-icon');
-    icon.parentNode.insertBefore(previewImg, icon);
-  };
-  reader.readAsDataURL(file);
-}
-
-function addTrack() {
-  const title = document.getElementById('track-title').value.trim();
-  const type = document.getElementById('track-type').value;
-  const price = document.getElementById('track-price').value.trim();
-  if (!title) { showToast('Enter a track title'); return; }
-  if (!price) { showToast('Enter a price'); return; }
-
-  const idx = tracks.length;
-  const track = { title, type, price, artDataUrl: selectedArtDataUrl };
-  tracks.push(track);
-
-  // Store blob URL in memory
-  if (selectedAudioFile) {
-    audioBlobUrls[idx] = URL.createObjectURL(selectedAudioFile);
-  }
-
-  // Save metadata (not audio — too large for localStorage)
-  try {
-    localStorage.setItem('kr_tracks_v3', JSON.stringify(tracks.map(t => ({
-      title: t.title, type: t.type, price: t.price,
-      artDataUrl: t.artDataUrl ? t.artDataUrl.substring(0, 200000) : null // limit art size
-    }))));
-  } catch(e) { console.warn('localStorage full, saving without art'); }
-
-  // Reset form
-  document.getElementById('track-title').value = '';
-  document.getElementById('track-price').value = '';
-  document.getElementById('audio-label').textContent = 'Click to select MP3 or WAV file';
-  document.getElementById('art-label').textContent = 'Click to upload cover image';
-  document.getElementById('art-preview-icon').textContent = '🖼️';
-  document.querySelectorAll('#admin-panel .upload-card img[style*="64px"]').forEach(el => el.remove());
-  selectedAudioFile = null;
-  selectedArtDataUrl = null;
-
-  renderTracks();
-  showToast(audioBlobUrls[idx] ? 'Track added — audio ready to play ✓' : 'Track added (no audio uploaded)');
-}
-
-// ═══════════════════════════════════════════════
-//  GALLERY
-// ═══════════════════════════════════════════════
-function renderGallery() {
-  const grid = document.getElementById('gallery-grid');
-  if (galleryItems.length === 0) {
-    grid.innerHTML = ['IMG','VID','IMG','IMG'].map(l =>
-      `<div class="gallery-item"><div class="gallery-placeholder">${l}</div></div>`
-    ).join('');
-    return;
-  }
-  grid.innerHTML = galleryItems.map(item =>
-    `<div class="gallery-item">${
-      item.type === 'video'
-        ? `<video src="${item.blobUrl}" muted loop autoplay playsinline></video>`
-        : `<img src="${item.blobUrl}" alt="gallery">`
-    }</div>`
-  ).join('');
-}
-
-function handleMediaUpload(input) {
-  Array.from(input.files).forEach(file => {
-    const blobUrl = URL.createObjectURL(file);
-    galleryItems.push({ blobUrl, type: file.type.startsWith('video') ? 'video' : 'image', name: file.name });
-    addUploadListItem(file.name, galleryItems.length - 1);
-  });
-  renderGallery();
-  showToast(`${input.files.length} file(s) added ✓`);
-}
-
-function handleMediaDrop(e) {
-  e.preventDefault();
-  document.getElementById('media-dropzone').style.borderColor = '';
-  handleMediaUpload({ files: e.dataTransfer.files });
-}
-
-function addUploadListItem(name, idx) {
-  const list = document.getElementById('upload-list');
-  const div = document.createElement('div');
-  div.className = 'upload-item';
-  div.id = 'ul-' + idx;
-  div.innerHTML = `<span class="name">${name}</span><span class="remove" onclick="removeGalleryItem(${idx})">×</span>`;
-  list.appendChild(div);
-}
-
-function removeGalleryItem(idx) {
-  galleryItems.splice(idx, 1);
-  renderGallery();
-  const el = document.getElementById('ul-' + idx);
-  if (el) el.remove();
-}
-
-// ═══════════════════════════════════════════════
-//  BIO
-// ═══════════════════════════════════════════════
-function saveBio() {
-  const q = document.getElementById('bio-quote-input').value.trim();
-  const p1 = document.getElementById('bio-p1-input').value.trim();
-  const p2 = document.getElementById('bio-p2-input').value.trim();
-  const years = document.getElementById('bio-years-input').value.trim();
-  const fans = document.getElementById('bio-fans-input').value.trim();
-  if (q) document.getElementById('bio-quote').textContent = '"' + q + '"';
-  if (p1) document.getElementById('bio-body-1').textContent = p1;
-  if (p2) document.getElementById('bio-body-2').textContent = p2;
-  if (years) document.getElementById('stat-years').textContent = years;
-  if (fans) document.getElementById('stat-fans').textContent = fans;
-  showToast('Bio updated ✓');
-}
-
-function handleBioPhoto(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  const container = document.getElementById('bio-photo-container');
-  container.innerHTML = `<img src="${url}" alt="Keith RSA">`;
-  showToast('Profile photo updated ✓');
-}
-
-// ═══════════════════════════════════════════════
-//  COMMENTS
-// ═══════════════════════════════════════════════
-function renderComments() {
-  document.getElementById('comment-list').innerHTML = comments.map(c => `
-    <div class="comment-card">
-      <div class="comment-header">
-        <span class="comment-author">${c.name}</span>
-        <span class="comment-date">${c.date}</span>
-      </div>
-      <p class="comment-text">${c.text}</p>
+    <div class="admin-panel">
+        <h2>Admin Panel</h2>
+        <form class="upload-form">
+            <input type="file" name="musicFile" accept="audio/*">
+            <button type="submit">Upload Custom Track</button>
+        </form>
     </div>
-  `).join('');
-}
-
-function submitComment() {
-  const name = document.getElementById('comment-name').value.trim();
-  const text = document.getElementById('comment-text').value.trim();
-  if (!name || !text) { showToast('Please enter name and comment'); return; }
-  comments.unshift({ name, text, date: 'Just now' });
-  try { localStorage.setItem('kr_comments', JSON.stringify(comments)); } catch(e) {}
-  document.getElementById('comment-name').value = '';
-  document.getElementById('comment-text').value = '';
-  renderComments();
-  showToast('Comment posted ✓');
-}
-
-// ═══════════════════════════════════════════════
-//  BUY MODAL
-// ═══════════════════════════════════════════════
-function openBuyModal(idx) {
-  buyTarget = idx;
-  const t = tracks[idx];
-  document.getElementById('modal-track-name').textContent = t.title + ' · ' + t.type;
-  document.getElementById('modal-price').textContent = 'R' + t.price;
-  document.getElementById('buy-modal').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('buy-modal').classList.remove('open');
-  buyTarget = null;
-}
-
-function completePurchase() {
-  const email = document.getElementById('buyer-email').value.trim();
-  if (!email.includes('@')) { showToast('Enter a valid email'); return; }
-  closeModal();
-  showToast('Purchase successful! Check your email ✓');
-}
-
-document.getElementById('buy-modal').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeModal();
-});
-
-// ═══════════════════════════════════════════════
-//  ADMIN LOCK
-// ═══════════════════════════════════════════════
-function unlockAdmin() {
-  const pass = document.getElementById('admin-pass').value;
-  if (pass === 'keith2024') {
-    document.getElementById('admin-lock').style.display = 'none';
-    document.getElementById('admin-panel').classList.add('unlocked');
-    showToast('Admin panel unlocked ✓');
-  } else {
-    showToast('Incorrect password');
-  }
-}
-
-// ═══════════════════════════════════════════════
-//  TOAST
-// ═══════════════════════════════════════════════
-let toastTimer;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
-}
-
-// ═══════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════
-renderTracks();
-renderGallery();
-renderComments();
-</script>
+    <div class="player-bar">
+        <!-- Player bar for custom tracks -->
+        <audio controls>
+            <source id="customTrackSource" src="" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+    <script>
+        document.querySelector('.upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fileInput = document.querySelector('input[name="musicFile"]');
+            const file = fileInput.files[0];
+            if (file) {
+                // Handle file upload logic here
+                console.log('File uploaded:', file.name);
+            }
+        });
+    </script>
 </body>
 </html>
